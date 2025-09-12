@@ -66,3 +66,4 @@ Based on upper report, draft an engaging blog post for general retail investors.
 지시사항:
 1) 모든 설명과 표, 제목을 자연스러운 한국어로 작성하세요.
 2) 가독성을 위해 소제목을 활용하고, 문단이 끝나면 빈줄을 추가해서 구분해주세요.
+3) 내용의 출처는 문장의 끝에 링크로 연결해주세요.
