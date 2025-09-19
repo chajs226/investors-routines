@@ -145,7 +145,7 @@ ${analysis.citations.map(citation => `- ${citation}`).join('\n')}
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              똑똑한 주주(Smart Shareholder)
+              똑똑한 주식 투자자(Smart Stock Investor)
           </h1>
   model: 'sonar-deep-research' // 기본값, 사용자가 수정 가능
           <p className="text-lg text-gray-600">
