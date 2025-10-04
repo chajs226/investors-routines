@@ -80,13 +80,14 @@ class PerplexityService:
 
         # 6. 호출 & 예외 처리
         try:
+            print(f"[Perplexity] Sending request to model={self.model}, timeout=250s...")
             response = requests.post(
                 self.base_url,
                 headers=self.headers,
                 json=payload,
-                timeout=180  # extended to 180s (3 minutes)
+                timeout=250  # extended to 250s (4 minutes)
             )
-            print(f"[Perplexity] status={response.status_code} body={response.text[:500]}")
+            print(f"[Perplexity] Received response: status={response.status_code} body={response.text[:500]}")
             try:
                 data = response.json()
             except Exception:
@@ -111,6 +112,20 @@ class PerplexityService:
     def format_analysis_response(self, api_response: Dict) -> Dict:
         """Perplexity API 응답을 단일 dict 형태로 정리"""
         try:
+            # 응답 구조 방어적 파싱
+            if "choices" not in api_response:
+                # choices가 없으면 원본 응답 전체를 로그하고 오류 상세 전달
+                print(f"[Perplexity Response Error] Missing 'choices' key. Full response: {json.dumps(api_response, ensure_ascii=False, indent=2)}")
+                
+                # error 필드가 있으면 명확한 메시지 반환
+                if "error" in api_response:
+                    error_info = api_response["error"]
+                    error_msg = error_info.get("message", str(error_info))
+                    raise ValueError(f"Perplexity API 오류: {error_msg}")
+                
+                # 그 외에는 응답 전체를 텍스트로 반환
+                raise ValueError(f"Perplexity API 응답 형식 오류: 'choices' 키가 없습니다. 응답: {api_response}")
+            
             content = api_response["choices"][0]["message"]["content"]
             citations = api_response.get("citations", [])
             return {
@@ -120,5 +135,12 @@ class PerplexityService:
                 "usage": api_response.get("usage", {}),
                 "created": api_response.get("created", 0)
             }
+        except (ValueError, KeyError) as e:
+            # 이미 명확한 메시지가 있으면 그대로 전달
+            if isinstance(e, ValueError):
+                raise
+            # KeyError는 상세 응답과 함께 ValueError로 변환
+            print(f"[Response Parse Error] {e}. Response keys: {list(api_response.keys())}")
+            raise ValueError(f"응답 파싱 실패: {e}. 받은 키: {list(api_response.keys())}")
         except Exception as e:
-            raise Exception(f"응답 처리 실패: {e}")
+            raise Exception(f"응답 처리 중 알 수 없는 오류: {e}")

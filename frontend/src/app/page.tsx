@@ -70,7 +70,7 @@ export default function Home() {
     setAnalysis(null);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 150000);
+    const timeoutId = setTimeout(() => controller.abort(), 250000); // 250초 타임아웃 (4분 이상)
     try {
       const query = formData.model ? `?model=${encodeURIComponent(formData.model)}` : '';
       const response = await axios.post(
@@ -87,7 +87,7 @@ export default function Home() {
       setAnalysis(response.data);
     } catch (err: any) {
       if (axios.isCancel(err)) {
-        setError('요청이 시간 초과되었습니다. (150초) 모델/기간을 조정하거나 다시 시도하세요.');
+        setError('요청이 시간 초과되었습니다. (250초/4분) 모델/기간을 조정하거나 다시 시도하세요.');
       } else if (err.name === 'AbortError') {
         setError('요청이 취소되었습니다.');
       } else {

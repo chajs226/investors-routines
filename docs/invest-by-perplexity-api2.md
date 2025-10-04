@@ -42,27 +42,6 @@ As an investment analyst, conduct a thorough investigation and generate a compre
 *   **Crucially, cite all sources used at the end of each section or as footnotes/endnotes.** (Perplexity will do this automatically, but explicitly requesting it reinforces the need for traceable information).
 *   Avoid verbose introductions; get straight to the analysis.
 
-
-6. **Blog draft post**
-Based on upper report, draft an engaging blog post for general retail investors. Simplify complex financial jargon and ensure the content is easy to understand. 
-- **Captivating Title (1):**
-    *   Create an attention-grabbing and specific title (e.g., "Is [company name] a Buy or Sell? What You Need to Know After Recent Shakes," or "Decoding [company name]'s Future: 5 Things Every Investor Should Watch").
-- **Engaging Introduction (1-2 paragraphs):**
-    *   Start by highlighting why [company name] is relevant to retail investors right now.
-    *   Clearly state what the reader will learn from the blog post, setting clear expectations.
-- **Simplified Body Content (using subheadings):**
-    *   **"The Bright Side: Why [company name] Might Be Poised for Growth"**: Rephrase the 'Positive Factors' from the report into simple, relatable language. Use **bold text** to emphasize key opportunities or strengths.
-    *   **"Watching the Risks: What Could Challenge [company name]'s Value"**: Convert the 'Negative Factors' and risks from the report into easily digestible points. Use **bold text** for critical warnings or challenges.
-    *   **"Key Takeaways & What to Watch Next"**: Summarize the core data-driven insights and investor recommendations from the report in an accessible way. What are the 1-2 most important things for a casual investor to monitor?
-- **Friendly Conclusion (1-2 paragraphs):**
-    *   Provide a concise summary of the blog post's main message.
-    *   End with an encouraging and actionable call to thought, advising readers on continued monitoring or further research.
-
-[Blog draft post's Tone & Style]
-*   Maintain a friendly, conversational, and educational tone. Avoid overly formal or technical financial language.
-*   Aim for clarity and conciseness, making the information digestible for someone without a finance background.
-*   Ensure smooth transitions between sections.
-
 지시사항:
 1) 모든 설명과 표, 제목을 자연스러운 한국어로 작성하세요.
 2) 가독성을 위해 소제목을 활용하고, 문단이 끝나면 빈줄을 추가해서 구분해주세요.
