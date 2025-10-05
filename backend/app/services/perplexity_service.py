@@ -80,12 +80,12 @@ class PerplexityService:
 
         # 6. 호출 & 예외 처리
         try:
-            print(f"[Perplexity] Sending request to model={self.model}, timeout=250s...")
+            print(f"[Perplexity] Sending request to model={self.model}, timeout=300s...")
             response = requests.post(
                 self.base_url,
                 headers=self.headers,
                 json=payload,
-                timeout=250  # extended to 250s (4 minutes)
+                timeout=300  # extended to 300s (5 minutes)
             )
             print(f"[Perplexity] Received response: status={response.status_code} body={response.text[:500]}")
             try:

@@ -21,14 +21,52 @@ interface AnalysisResponse {
   created: number;
 }
 
+// Markdown 표를 HTML 테이블로 변환하는 헬퍼 함수
+const convertMarkdownTableToHTML = (markdown: string): string => {
+  const lines = markdown.trim().split('\n').filter(line => line.trim());
+  if (lines.length < 2) return markdown;
+
+  let html = '<table class="min-w-full border-collapse border-2 border-blue-300 shadow-lg">';
+  
+  // 헤더 처리
+  const headers = lines[0].split('|').map(h => h.trim()).filter(h => h);
+  html += '<thead class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">';
+  html += '<tr>';
+  headers.forEach(header => {
+    html += `<th class="px-4 py-3 text-left font-bold border border-blue-400">${header}</th>`;
+  });
+  html += '</tr></thead>';
+  
+  // 구분선 스킵 (두 번째 줄)
+  html += '<tbody class="bg-white">';
+  
+  // 데이터 행 처리
+  for (let i = 2; i < lines.length; i++) {
+    const cells = lines[i].split('|').map(c => c.trim()).filter(c => c);
+    const rowClass = i % 2 === 0 ? 'bg-blue-50' : 'bg-white';
+    html += `<tr class="${rowClass} hover:bg-blue-100 transition-colors">`;
+    cells.forEach((cell, idx) => {
+      // 첫 번째 열은 굵게
+      const cellClass = idx === 0 
+        ? 'px-4 py-3 font-semibold text-gray-800 border border-gray-300' 
+        : 'px-4 py-3 text-gray-700 border border-gray-300';
+      html += `<td class="${cellClass}">${cell}</td>`;
+    });
+    html += '</tr>';
+  }
+  
+  html += '</tbody></table>';
+  return html;
+};
+
 export default function Home() {
   const [formData, setFormData] = useState({
     stockCode: '',
     stockName: '',
     comparePeriods: ['', ''],
     apiKey: '',
-    market: '국내',
-    model: 'sonar-reasoning-pro'
+    model: 'sonar-deep-research', // 기본값, 사용자가 수정 가능
+    market: '국내'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
@@ -70,7 +108,7 @@ export default function Home() {
     setAnalysis(null);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 250000); // 250초 타임아웃 (4분 이상)
+    const timeoutId = setTimeout(() => controller.abort(), 300000); // 300초 타임아웃 (5분)
     try {
       const query = formData.model ? `?model=${encodeURIComponent(formData.model)}` : '';
       const response = await axios.post(
@@ -87,7 +125,7 @@ export default function Home() {
       setAnalysis(response.data);
     } catch (err: any) {
       if (axios.isCancel(err)) {
-        setError('요청이 시간 초과되었습니다. (250초/4분) 모델/기간을 조정하거나 다시 시도하세요.');
+        setError('요청이 시간 초과되었습니다. (300초/5분) 모델/기간을 조정하거나 다시 시도하세요.');
       } else if (err.name === 'AbortError') {
         setError('요청이 취소되었습니다.');
       } else {
@@ -318,24 +356,59 @@ ${analysis.citations.map(citation => `- ${citation}`).join('\n')}
               </div>
             </CardHeader>
             <CardContent className="space-y-8">
+              {/* 재무 데이터 표 섹션 */}
+              {analysis.financial_table && (
+                <section className="mb-8">
+                  <h3 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-blue-500">📊 핵심 재무 지표</h3>
+                  <div className="overflow-x-auto">
+                    <div 
+                      className="financial-table-container"
+                      dangerouslySetInnerHTML={{ 
+                        __html: convertMarkdownTableToHTML(analysis.financial_table) 
+                      }}
+                    />
+                  </div>
+                </section>
+              )}
+
+              {/* 분석 내용 섹션 */}
               <section>
-                <h3 className="text-xl font-semibold mb-4">재무 지표 표</h3>
-                <div className="overflow-auto border rounded-md bg-gray-50 p-3">
-                  <ReactMarkdown>{'\n' + analysis.financial_table + '\n'}</ReactMarkdown>
+                <h3 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-blue-500">📈 투자 분석</h3>
+                <div className="prose prose-lg max-w-none">
+                  <ReactMarkdown
+                    components={{
+                      h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-8 mb-4 text-gray-900" {...props} />,
+                      h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-6 mb-3 text-gray-800" {...props} />,
+                      h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-5 mb-2 text-gray-700" {...props} />,
+                      p: ({node, ...props}) => <p className="mb-4 leading-relaxed text-gray-700" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-bold text-gray-900 bg-yellow-100 px-1" {...props} />,
+                      ul: ({node, ...props}) => <ul className="list-disc list-inside mb-4 space-y-2" {...props} />,
+                      ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-4 space-y-2" {...props} />,
+                      li: ({node, ...props}) => <li className="ml-4 text-gray-700" {...props} />,
+                      table: ({node, ...props}) => (
+                        <div className="overflow-x-auto my-6 shadow-lg rounded-lg">
+                          <table className="min-w-full border-collapse border-2 border-blue-300" {...props} />
+                        </div>
+                      ),
+                      thead: ({node, ...props}) => <thead className="bg-gradient-to-r from-blue-500 to-blue-600 text-white" {...props} />,
+                      tbody: ({node, ...props}) => <tbody className="bg-white divide-y divide-gray-200" {...props} />,
+                      tr: ({node, ...props}) => <tr className="hover:bg-blue-50 transition-colors" {...props} />,
+                      th: ({node, ...props}) => <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider border border-blue-400" {...props} />,
+                      td: ({node, ...props}) => <td className="px-6 py-4 text-sm text-gray-700 border border-gray-300 whitespace-nowrap" {...props} />,
+                    }}
+                  >
+                    {analysis.analysis}
+                  </ReactMarkdown>
                 </div>
-              </section>
-              <section>
-                <h3 className="text-xl font-semibold mb-4">분석 내용</h3>
-                <ReactMarkdown>{analysis.analysis}</ReactMarkdown>
               </section>
 
               {analysis.citations.length > 0 && (
                 <div className="pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">참고 자료</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">📚 참고 자료</h3>
                   <ul className="space-y-2">
                     {analysis.citations.map((citation, index) => (
-                      <li key={index} className="text-sm text-gray-600">
-                        {citation}
+                      <li key={index} className="text-sm text-gray-600 hover:text-blue-600">
+                        • {citation}
                       </li>
                     ))}
                   </ul>
