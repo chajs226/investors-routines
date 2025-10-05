@@ -112,8 +112,9 @@ export default function Home() {
     const timeoutId = setTimeout(() => controller.abort(), 300000); // 300초 타임아웃 (5분)
     try {
       const query = formData.model ? `?model=${encodeURIComponent(formData.model)}` : '';
+      // Next.js rewrites 프록시를 우회하고 직접 백엔드로 요청
       const response = await axios.post(
-        `/api/backend/analysis/analyze${query}`,
+        `http://localhost:8000/api/analysis/analyze${query}`,
         {
           stock_code: formData.stockCode,
           stock_name: formData.stockName,
@@ -158,7 +159,8 @@ ${analysis.citations.map(citation => `- ${citation}`).join('\n')}
 
     try {
       const filename = `investment-report-${analysis.stock_name}-${new Date().toISOString().split('T')[0]}.md`;
-      const res = await axios.post('/api/backend/analysis/save_markdown', {
+      // Next.js rewrites 프록시를 우회하고 직접 백엔드로 요청
+      const res = await axios.post('http://localhost:8000/api/analysis/save_markdown', {
         content,
         filename
       });
